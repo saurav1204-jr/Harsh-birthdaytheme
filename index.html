@@ -61,6 +61,106 @@
     }
     #player { width: 100%; height: 100%; }
 
+    /* FUNNY LOCK OVERLAY */
+    #lockOverlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(0,0,0,0.9), rgba(0,0,0,0.98));
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 40;
+      text-align: center;
+      color: #fff;
+    }
+    #lockOverlay.visible {
+      display: flex;
+    }
+    .lock-box {
+      background: rgba(20,20,20,0.95);
+      border-radius: 18px;
+      padding: 24px 26px;
+      border: 2px dashed #ffd166;
+      box-shadow: 0 0 30px rgba(0,0,0,0.9);
+      max-width: 340px;
+    }
+    .lock-emoji {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+    #lockOverlay h2 {
+      margin-bottom: 8px;
+      font-size: 1.3rem;
+    }
+    #lockOverlay p {
+      margin-bottom: 14px;
+      font-size: 0.95rem;
+      color: #ddd;
+    }
+    #lockOverlay input {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      margin-right: 6px;
+    }
+    #lockOverlay button {
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #ffd166;
+      color: #111;
+      font-weight: 700;
+    }
+    #lockMessage {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #ff8a8a;
+      min-height: 18px;
+    }
+
+    /* COUNTDOWN OVERLAY */
+    #countdownOverlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(0,0,0,0.9), rgba(0,0,0,0.98));
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 30;
+      text-align: center;
+      color: #fff;
+    }
+    #countdownOverlay.visible {
+      display: flex;
+    }
+    .countdown-box {
+      background: rgba(15,15,15,0.95);
+      border-radius: 18px;
+      padding: 20px 24px;
+      border: 2px solid #7dd3fc;
+      box-shadow: 0 0 30px rgba(0,0,0,0.9);
+      max-width: 360px;
+    }
+    .countdown-title {
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+    .countdown-text {
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      color: #e5e7eb;
+    }
+    #countdownTimer {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #ffd166;
+    }
+
     /* Space stage */
     #space-stage {
       position: fixed;
@@ -316,7 +416,6 @@
       transition: transform 0.6s ease, opacity 0.6s ease, top 0.6s ease, left 0.6s ease;
     }
 
-    /* Positions: each new card only covers a small part (~corner) of previous */
     .card-pos-1 { left: 50%; top: 50%; transform: translate(-50%, -50%); }
     .card-pos-2 { left: 60%; top: 42%; transform: translate(-50%, -50%); }
     .card-pos-3 { left: 40%; top: 42%; transform: translate(-50%, -50%); }
@@ -385,7 +484,6 @@
       text-align: center;
     }
 
-    /* Final queue + fly animations */
     .queue-mode .flip-card {
       pointer-events: none;
     }
@@ -458,6 +556,32 @@
   <!-- Milky Way background -->
   <div id="bg" class="milky-way-bg bg-slow"></div>
   <div class="space-overlay"></div>
+
+  <!-- COUNTDOWN OVERLAY -->
+  <div id="countdownOverlay">
+    <div class="countdown-box">
+      <div class="countdown-title">Wait for the Perfect Moment ✨</div>
+      <div class="countdown-text">
+        Yeh surprise thoda special hai, isliye thoda waqt bhi special hai.<br>
+        Jab yeh timer zero hoga tabhi aage ka magic unlock hoga.
+      </div>
+      <div id="countdownTimer">00:00:00</div>
+    </div>
+  </div>
+
+  <!-- FUNNY LOCK -->
+  <div id="lockOverlay">
+    <div class="lock-box">
+      <div class="lock-emoji">🔐😏</div>
+      <h2>Secret Birthday Zone</h2>
+      <p id="lockText">Is surprise ko aage dekhne ke liye ek chhota sa secret pass chahiye. Pehle yeh lock clear karo. 😉</p>
+      <div>
+        <input type="password" id="lockInput" placeholder="Enter secret code" />
+        <button id="lockBtn">UNLOCK 🚀</button>
+      </div>
+      <div id="lockMessage"></div>
+    </div>
+  </div>
 
   <!-- YouTube stage -->
   <div id="video-stage">
@@ -681,7 +805,6 @@
       Kaisa laga?? 😏😂<br>
       Thoda filmy ho gaya na, par tu isse zyada deserve karta hai.
     </div>
-    <!-- First panda for THANK-YOU screen -->
     <img
       id="pandaGif1"
       class="panda-gif"
@@ -689,7 +812,6 @@
       alt="Thank you panda"
       style="display:none;"
     />
-    <!-- Second panda for KAISA LAGA screen -->
     <img
       id="pandaGif2"
       class="panda-gif"
@@ -707,7 +829,7 @@
     </a>
   </div>
 
-  <!-- YouTube IFrame API: 3 songs -->
+  <!-- YouTube IFrame API: songs + logic -->
   <script>
     const videoIds = ['6Vbgeiu9AIU','C1DucVoyfwY','ZEkW7pd5vo0'];
     let currentIndex = 0;
@@ -717,6 +839,22 @@
       'flipCard1','flipCard2','flipCard3','flipCard4','flipCard5',
       'flipCard6','flipCard7','flipCard8','flipCard9','flipCard10'
     ];
+
+    let flowUnlocked = false;
+
+    function showCountdown() {
+      document.getElementById('countdownOverlay').classList.add('visible');
+    }
+
+    function hideCountdown() {
+      document.getElementById('countdownOverlay').classList.remove('visible');
+    }
+
+    function showLock() {
+      const lockText = document.getElementById('lockText');
+      lockText.textContent = 'Pehle ye clear karo, phir aage ka surprise milega. 😉';
+      document.getElementById('lockOverlay').classList.add('visible');
+    }
 
     (function () {
       const tag = document.createElement('script');
@@ -733,90 +871,127 @@
       });
     }
 
-    function onPlayerStateChange(event) {
+    function startBirthdayFlow() {
+      if (flowUnlocked) return;
+      flowUnlocked = true;
+
       const videoStage  = document.getElementById('video-stage');
       const spaceStage  = document.getElementById('space-stage');
       const cakeWrapper = document.getElementById('cakeWrapper');
       const bg          = document.getElementById('bg');
       const cardArea    = document.getElementById('cardArea');
 
+      videoStage.style.opacity = '0';
+      videoStage.style.visibility = 'hidden';
+
+      bg.classList.remove('bg-slow');
+      bg.classList.add('bg-medium');
+
+      spaceStage.style.visibility = 'visible';
+      spaceStage.style.opacity = '1';
+      cakeWrapper.classList.add('visible');
+
+      setTimeout(() => {
+        cakeWrapper.classList.add('disappear');
+
+        bg.classList.remove('bg-medium');
+        bg.classList.add('bg-fast');
+
+        setTimeout(() => {
+          bg.classList.remove('bg-fast');
+          bg.classList.add('bg-slow');
+
+          cardArea.style.display = 'flex';
+          requestAnimationFrame(() => {
+            cardArea.classList.add('visible');
+
+            const flipCard1 = document.getElementById('flipCard1');
+            setTimeout(() => {
+              flipCard1.classList.add('flipped');
+              setTimeout(() => {
+                flipCard1.classList.remove('flipped');
+              }, 2300);
+            }, 800);
+
+            const laterCards = cardIds.slice(1);
+            laterCards.forEach((id, index) => {
+              setTimeout(() => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.style.transition = 'opacity 0.7s ease';
+                el.style.opacity = '1';
+                el.style.pointerEvents = 'auto';
+              }, (index + 1) * 15000);
+            });
+
+            const totalCards = laterCards.length;
+            const lastCardTime = (totalCards) * 15000;
+            setTimeout(startEndingSequence, lastCardTime + 15000);
+          });
+        }, 1200);
+      }, 20000);
+    }
+
+    function onPlayerStateChange(event) {
+      const spaceStage  = document.getElementById('space-stage');
+
       if (event.data === YT.PlayerState.PLAYING && !spaceStage.dataset.started) {
         spaceStage.dataset.started = 'true';
 
-        videoStage.style.opacity = '0';
-        videoStage.style.visibility = 'hidden';
-
-        bg.classList.remove('bg-slow');
-        bg.classList.add('bg-medium');
-
-        spaceStage.style.visibility = 'visible';
-        spaceStage.style.opacity = '1';
-        cakeWrapper.classList.add('visible');
-
-        setTimeout(() => {
-          cakeWrapper.classList.add('disappear');
-
-          bg.classList.remove('bg-medium');
-          bg.classList.add('bg-fast');
-
-          setTimeout(() => {
-            bg.classList.remove('bg-fast');
-            bg.classList.add('bg-slow');
-
-            // show card area
-            cardArea.style.display = 'flex';
-            requestAnimationFrame(() => {
-              cardArea.classList.add('visible');
-
-              const flipCard1 = document.getElementById('flipCard1');
-              setTimeout(() => {
-                flipCard1.classList.add('flipped');
-                setTimeout(() => {
-                  flipCard1.classList.remove('flipped');
-                }, 2300);
-              }, 800);
-
-              // sequentially show other cards every 15 seconds
-              const laterCards = cardIds.slice(1);
-              laterCards.forEach((id, index) => {
-                setTimeout(() => {
-                  const el = document.getElementById(id);
-                  if (!el) return;
-                  el.style.transition = 'opacity 0.7s ease';
-                  el.style.opacity = '1';
-                  el.style.pointerEvents = 'auto';
-                }, (index + 1) * 15000);
-              });
-
-              // after last card visible + 15s: start ending sequence
-              const totalCards = laterCards.length;
-              const lastCardTime = (totalCards) * 15000;
-              setTimeout(startEndingSequence, lastCardTime + 15000);
-            });
-          }, 1200);
-        }, 20000);
+        showCountdown();
+        startCountdownAndThenLock();
       }
 
       if (event.data === YT.PlayerState.ENDED) {
         currentIndex++;
         if (currentIndex < videoIds.length) {
           player.loadVideoById(videoIds[currentIndex]);
+          const videoStage  = document.getElementById('video-stage');
           videoStage.style.opacity = '0';
           videoStage.style.visibility = 'hidden';
         }
       }
     }
 
-    // Ending sequence: flip all, queue, fly away, then texts + pandas
+    function startCountdownAndThenLock() {
+      const timerEl = document.getElementById('countdownTimer');
+
+      // MIDNIGHT AFTER TODAY: Jan 22, 2026 00:00:00
+      const targetTime = new Date('Jan 22, 2026 00:00:00').getTime();
+
+      showCountdown();
+
+      const x = setInterval(function() {
+        const now = new Date().getTime();
+        const distance = targetTime - now;
+
+        if (distance <= 0) {
+          clearInterval(x);
+          timerEl.textContent = '00:00:00';
+          hideCountdown();
+          showLock();
+          return;
+        }
+
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        const hh = String(hours).padStart(2, '0');
+        const mm = String(minutes).padStart(2, '0');
+        const ss = String(seconds).padStart(2, '0');
+
+        timerEl.textContent = hh + ':' + mm + ':' + ss;
+      }, 1000);
+    }
+
     function startEndingSequence() {
       const cardArea = document.getElementById('cardArea');
       const cards = cardIds.map(id => document.getElementById(id)).filter(Boolean);
       if (!cards.length) return;
 
-      // 1) Flip all cards to show messages
       cards.forEach(c => c.classList.add('flipped'));
 
-      // 2) After 2s, move into vertical queue
       setTimeout(() => {
         cardArea.classList.add('queue-mode');
         const centerX = window.innerWidth / 2;
@@ -829,13 +1004,11 @@
           card.style.transform = 'translate(-50%, -50%)';
         });
 
-        // 3) After 2s queued, fly all around and fade
         setTimeout(() => {
           cards.forEach(card => {
             card.classList.add('fly-away');
           });
 
-          // 4) After 2s of fly animation, hide cards + show ending text
           setTimeout(() => {
             cardArea.style.display = 'none';
 
@@ -849,7 +1022,6 @@
             endingText1.style.display = 'block';
             pandaGif1.style.display = 'block';
 
-            // After 10s, switch to "Kaisa laga??" + second panda
             setTimeout(() => {
               endingText1.style.display = 'none';
               pandaGif1.style.display = 'none';
@@ -862,7 +1034,6 @@
       }, 2000);
     }
 
-    // Tap / click: flip each card independently (during main viewing)
     document.addEventListener('DOMContentLoaded', () => {
       cardIds.forEach(id => {
         const el = document.getElementById(id);
@@ -871,7 +1042,29 @@
           el.classList.toggle('flipped');
         });
       });
+
+      const correctPassword = '22012010';
+      const lockOverlay = document.getElementById('lockOverlay');
+      const lockInput = document.getElementById('lockInput');
+      const lockBtn = document.getElementById('lockBtn');
+      const lockMessage = document.getElementById('lockMessage');
+
+      lockBtn.addEventListener('click', () => {
+        if (lockInput.value.trim() === correctPassword) {
+          lockOverlay.classList.remove('visible');
+          startBirthdayFlow();
+        } else {
+          lockMessage.textContent = 'Bahot sahi pass hai, ek baar aur try karna 😏';
+        }
+      });
+
+      lockInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          lockBtn.click();
+        }
+      });
     });
   </script>
 </body>
 </html>
+
