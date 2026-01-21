@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Harsh Birthday Space Surprise</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Galaxy background */
+    .milky-way-bg {
+      position: fixed;
+      inset: 0;
+      background: url('https://cdn.eso.org/images/wallpaper5/eso0932a.jpg') repeat-x center/cover;
+      filter: brightness(1.1) contrast(1.1);
+      z-index: -1;
+    }
+    .bg-slow   { animation: galaxyDriftSlow 60s linear infinite; }
+    .bg-fast   { animation: galaxyDriftFast 15s linear infinite; }
+    .bg-medium { animation: galaxyDriftMedium 35s linear infinite; }
+
+    @keyframes galaxyDriftSlow   { 0% {background-position:0 50%} 100% {background-position:200% 50%} }
+    @keyframes galaxyDriftFast   { 0% {background-position:0 50%} 100% {background-position:400% 50%} }
+    @keyframes galaxyDriftMedium { 0% {background-position:0 50%} 100% {background-position:260% 50%} }
+
+    .space-overlay {
+      position: fixed;
+      inset: 0;
+      background: url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+      opacity: 0.5;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* YouTube stage */
+    #video-stage {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+    #video-container {
+      width: 80%;
+      max-width: 900px;
+      aspect-ratio: 16 / 9;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.9);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000;
+      border: 1px solid rgba(255,255,255,0.35);
+    }
+    #player { width: 100%; height: 100%; }
+
+    /* Space stage */
+    #space-stage {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 1s ease-out, visibility 1s ease-out;
+      z-index: 5;
+    }
+
+    /* CAKE + TEXT */
+    .cake-wrapper {
+      position: relative;
+      z-index: 5;
+      opacity: 0;
+      transform: translateY(40px) scale(0.7);
+      transition: opacity 1.1s ease-out, transform 1.1s ease-out;
+      pointer-events: auto;
+      text-align: center;
+    }
+    .cake-wrapper.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      animation: popBounce 0.9s ease-out;
+    }
+    .cake-wrapper.disappear {
+      opacity: 0;
+      transform: translateY(-30px) scale(0.9);
+      transition: opacity 1s ease-out, transform 1s ease-out;
+    }
+
+    @keyframes popBounce {
+      0%   { transform: translateY(40px) scale(0.5); opacity: 0; }
+      50%  { transform: translateY(-10px) scale(1.05); opacity: 1; }
+      75%  { transform: translateY(4px) scale(0.98); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    .cake {
+      position: relative;
+      width: 260px;
+      margin: 0 auto 20px;
+    }
+
+    .cake-base {
+      width: 100%;
+      height: 95px;
+      background: linear-gradient(180deg, #6b3d29, #3f2419);
+      border-radius: 0 0 22px 22px;
+      box-shadow: 0 16px 35px rgba(0,0,0,0.85);
+      position: relative;
+      overflow: visible;
+    }
+
+    .cake-icing {
+      position: absolute;
+      top: -28px;
+      left: 0;
+      width: 100%;
+      height: 62px;
+      background: linear-gradient(135deg, #ffe6ff, #f6d4ff);
+      border-radius: 22px 22px 12px 12px;
+      box-shadow: 0 0 26px rgba(255,255,255,0.7);
+    }
+
+    .icing-drip {
+      position: absolute;
+      width: 30px;
+      height: 40px;
+      background: #f6d4ff;
+      border-radius: 15px;
+      bottom: -18px;
+      box-shadow: 0 0 8px rgba(255,255,255,0.5);
+    }
+    .icing-drip:nth-child(1) { left: 26px; }
+    .icing-drip:nth-child(2) { left: 92px; height: 50px; }
+    .icing-drip:nth-child(3) { left: 155px; }
+    .icing-drip:nth-child(4) { left: 205px; height: 46px; }
+
+    .cake-stripes {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(
+        -45deg,
+        rgba(255,255,255,0.12) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255,255,255,0.12) 50%,
+        rgba(255,255,255,0.12) 75%,
+        transparent 75%,
+        transparent 100%
+      );
+      background-size: 26px 26px;
+      opacity: 0.9;
+    }
+
+    .candles {
+      position: absolute;
+      top: -70px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 22px;
+      animation: candlesSway 2s ease-in-out infinite alternate;
+      z-index: 3;
+    }
+    @keyframes candlesSway {
+      0%   { transform: translateX(-50%) rotateZ(-3deg); }
+      100% { transform: translateX(-50%) rotateZ(3deg); }
+    }
+
+    .candle {
+      width: 16px;
+      height: 46px;
+      background: #fffdf5;
+      border-radius: 5px;
+      position: relative;
+      box-shadow: 0 0 8px rgba(255,255,255,0.7);
+      overflow: hidden;
+    }
+    .candle::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        rgba(255, 105, 180, 0.85),
+        rgba(255, 105, 180, 0.85) 4px,
+        transparent 4px,
+        transparent 8px
+      );
+      opacity: 0.8;
+    }
+    .candle::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.7), transparent 50%);
+      mix-blend-mode: screen;
+    }
+
+    .flame {
+      position: absolute;
+      top: -26px;
+      left: 50%;
+      width: 18px;
+      height: 26px;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle at 30% 25%, #fff, #ffd166 60%, rgba(255,140,0,0.2) 100%);
+      box-shadow:
+        0 0 22px rgba(255,215,0,0.95),
+        0 0 36px rgba(255,165,0,0.8);
+      animation:
+        flameFlicker 0.35s infinite alternate,
+        flameDance 1.1s ease-in-out infinite;
+    }
+    @keyframes flameFlicker {
+      0%   { transform: translateX(-50%) scale(0.9);  opacity: 0.8; filter: blur(0.4px); }
+      100% { transform: translateX(-50%) scale(1.25); opacity: 1;   filter: blur(0);      }
+    }
+    @keyframes flameDance {
+      0%   { top: -27px; }
+      50%  { top: -22px; }
+      100% { top: -29px; }
+    }
+
+    .candle-glow {
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      width: 110px;
+      height: 28px;
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse at center, rgba(255,255,255,0.55), transparent 70%);
+      opacity: 0.95;
+      pointer-events: none;
+      filter: blur(3px);
+      z-index: 2;
+    }
+
+    .wish-text {
+      max-width: 520px;
+      margin: 0 auto;
+      font-size: 1.2rem;
+      line-height: 1.5;
+      text-shadow: 0 0 12px rgba(0,0,0,0.9);
+    }
+
+    .wish-line {
+      display: block;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInLine 1.4s ease-out forwards;
+    }
+    .wish-line:nth-child(1) { animation-delay: 0.4s; }
+    .wish-line:nth-child(2) { animation-delay: 1.6s; }
+    .wish-line:nth-child(3) { animation-delay: 2.8s; }
+    .wish-line:nth-child(4) { animation-delay: 4.0s; }
+    .wish-line:nth-child(5) { animation-delay: 5.2s; }
+    .wish-line:nth-child(6) { animation-delay: 6.4s; }
+
+    @keyframes fadeInLine {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .name {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #ffd166;
+    }
+
+    /* CARD area – stacked solo pics of him */
+    .card-area {
+      position: fixed;
+      inset: 0;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      perspective: 1000px;
+      opacity: 0;
+      transform: translateY(80px) scale(0.6);
+      transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+      z-index: 8;
+    }
+    .card-area.visible {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      animation: cardEnter 0.7s ease-out;
+    }
+
+    @keyframes cardEnter {
+      0%   { transform: translateY(140px) scale(0.4); opacity: 0; }
+      70%  { transform: translateY(-8px) scale(1.05); opacity: 1; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .flip-card {
+      width: 260px;
+      height: 360px;
+      position: absolute;
+      cursor: pointer;
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.9);
+      transform-style: preserve-3d;
+      transition: transform 0.6s ease, opacity 0.6s ease, top 0.6s ease, left 0.6s ease;
+    }
+
+    /* Positions: each new card only covers a small part (~corner) of previous */
+    .card-pos-1 { left: 50%; top: 50%; transform: translate(-50%, -50%); }
+    .card-pos-2 { left: 60%; top: 42%; transform: translate(-50%, -50%); }
+    .card-pos-3 { left: 40%; top: 42%; transform: translate(-50%, -50%); }
+    .card-pos-4 { left: 60%; top: 58%; transform: translate(-50%, -50%); }
+    .card-pos-5 { left: 40%; top: 58%; transform: translate(-50%, -50%); }
+    .card-pos-6 { left: 55%; top: 35%; transform: translate(-50%, -50%); }
+    .card-pos-7 { left: 45%; top: 35%; transform: translate(-50%, -50%); }
+    .card-pos-8 { left: 65%; top: 50%; transform: translate(-50%, -50%); }
+    .card-pos-9 { left: 35%; top: 50%; transform: translate(-50%, -50%); }
+    .card-pos-10 { left: 55%; top: 65%; transform: translate(-50%, -50%); }
+
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transform-style: preserve-3d;
+      transition: transform 0.6s ease;
+    }
+
+    .flip-card.flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .flip-card-front,
+    .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      border-radius: 18px;
+      overflow: hidden;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .flip-card-front {
+      background: #000;
+    }
+    .flip-card-front img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .flip-card-back {
+      background: #ffffff;
+      color: #111111;
+      transform: rotateY(180deg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .flip-card-back h3 {
+      margin-bottom: 10px;
+      font-size: 1.3rem;
+      color: #333333;
+    }
+    .flip-card-back p {
+      font-size: 0.98rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    /* Final queue + fly animations */
+    .queue-mode .flip-card {
+      pointer-events: none;
+    }
+
+    .fly-away {
+      position: absolute;
+      animation: flyAround 2s linear forwards;
+    }
+
+    @keyframes flyAround {
+      0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      50%  { transform: translate(200%, -200%) scale(1.2); opacity: 1; }
+      100% { transform: translate(-300%, 300%) scale(0.4); opacity: 0; }
+    }
+
+    /* Ending texts + panda GIFs + Insta */
+    .ending-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      z-index: 20;
+      background: url('https://cdn.eso.org/images/wallpaper5/eso0932a.jpg') center/cover no-repeat;
+      color: #fff;
+    }
+    .ending-overlay::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(0,0,0,0.65), rgba(0,0,0,0.9));
+      z-index: -1;
+    }
+    .ending-overlay.visible {
+      display: flex;
+    }
+    .ending-text {
+      font-size: 1.4rem;
+      max-width: 600px;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .ending-text-2 {
+      font-size: 1.5rem;
+      margin-top: 10px;
+    }
+    .panda-gif {
+      width: 180px;
+      height: auto;
+      border-radius: 10px;
+      margin-top: 12px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.25);
+    }
+    .insta-link {
+      position: absolute;
+      bottom: 20px;
+      font-size: 0.95rem;
+      color: #ffd166;
+      text-decoration: none;
+      letter-spacing: 0.5px;
+    }
+    .insta-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Milky Way background -->
+  <div id="bg" class="milky-way-bg bg-slow"></div>
+  <div class="space-overlay"></div>
+
+  <!-- YouTube stage -->
+  <div id="video-stage">
+    <div id="video-container">
+      <div id="player"></div>
+    </div>
+  </div>
+
+  <!-- Space stage -->
+  <div id="space-stage">
+    <div class="cake-wrapper" id="cakeWrapper">
+      <div class="cake">
+        <div class="cake-base">
+          <div class="cake-icing">
+            <div class="icing-drip"></div>
+            <div class="icing-drip"></div>
+            <div class="icing-drip"></div>
+            <div class="icing-drip"></div>
+          </div>
+          <div class="cake-stripes"></div>
+          <div class="candles">
+            <div class="candle"><div class="flame"></div></div>
+            <div class="candle"><div class="flame"></div></div>
+            <div class="candle"><div class="flame"></div></div>
+            <div class="candle-glow"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wish-text">
+        <span class="wish-line">Happy Birthday,</span>
+        <span class="wish-line name">Harsh Sinha 🎂</span>
+        <span class="wish-line">You have no idea how inspiring you actually are.</span>
+        <span class="wish-line">The way you handle life, keep smiling, and still care for others</span>
+        <span class="wish-line">makes you much more than “just a friend”.</span>
+        <span class="wish-line">You’re the kind of person anyone would be lucky to call a brother. 🌌</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD area – only his solo pics -->
+  <div class="card-area" id="cardArea">
+    <!-- 1 -->
+    <div class="flip-card card-pos-1" id="flipCard1">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <img src="https://scontent.fpat2-2.fna.fbcdn.net/v/t1.15752-9/611895273_1234419965255523_7396764807109189736_n.jpg?stp=dst-jpg_p480x480_tt6&_nc_cat=109&ccb=1-7&_nc_sid=0024fc&_nc_ohc=iGAeOlQ_Ih4Q7kNvwHBnovx&_nc_oc=Adlhg2D15MfpjA7WmXNn27fE3KBLRXUcqAB7nqDPBUHFTGOD2UWZPSUxXNQtOMoY_l4R6VMZhk0_yq8fyjiIty5s&_nc_ad=z-m&_nc_cid=1174&_nc_zt=23&_nc_ht=scontent.fpat2-2.fna&oh=03_Q7cD4QERxa0tAqYaj3ZZVplDEdH6k2fq6wFLuZlFHUnXFTnysA&oe=6996D573" alt="Pic 1" />
+        </div>
+        <div class="flip-card-back">
+          <h3>Always You</h3>
+          <p>
+            Even in a crowd, your energy stands out.<br>
+            You don’t just enter a room, you change its whole vibe.<br>
+            Never underestimate the kind of light you carry.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="flip-card card-pos-2" id="flipCard2" style="opacity:0; pointer-events:none;">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <img src="https://scontent.fpat2-8.fna.fbcdn.net/v/t1.15752-9/601165210_1582599822881346_6379259054481354998_n.jpg?stp=dst-jpg_p480x480_tt6&_nc_cat=103&ccb=1-7&_nc_sid=0024fc&_nc_ohc=sOWv_F1bxNIQ7kNvwEJkB4z&_nc_oc=AdnQHVP3L-Mvg9-CkAqF52dp5OAf81d3LitFgDZjysisxMJhQ8GID9gtBW3vF2lYS7aHedRyoJEQvKYcefIaYLKU&_nc_ad=z-m&_nc_cid=1174&_nc_zt=23&_nc_ht=scontent.fpat2-8.fna&oh=03_Q7cD4QGb8nwF6yeBfgOUz7WT-XVPAw8QZ_f5rE5ScBSo0LQUzg&oe=6996BF05" alt="Pic 2" />
+        </div>
+        <div class="flip-card-back">
+          <h3>Your Peaceful Side</h3>
+          <p>
+            This is the version of you the world needs to see more often.<br>
+            Calm, confident, genuinely happy in your own space.<br>
+            Never dim this side of you for anyone.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="flip-card card-pos-3" id="flipCard3" style="opacity:0; pointer-events:none;">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <img src="https://scontent.fpat2-3.fna.fbcdn.net/v/t1.15752-9/614919733_1557824055435643_9157307802319445667_n.jpg?stp=dst-jpg_p480x480_tt6&_nc_cat=111&ccb=1-7&_nc_sid=0024fc&_nc_ohc=Z7xR2cMW5mAQ7kNvwF_nlW0&_nc_oc=AdmIclhhJNgpNlyYy3OuU7TRj1Y68xV3OAhKq_e25Eb5_UgUSdYcxlFMX4wIJAgQ4u5STCj2dK_UXemf39goeTwi&_nc_ad=z-m&_nc_cid=1174&_nc_zt=23&_nc_ht=scontent.fpat2-3.fna&oh=03_Q7cD4QEWO-IlsoxZN4Bx_sM4Z-Q0Du7317lA-DNg2mIDfHT4Jg&oe=6996BC42" alt="Pic 3" />
+        </div>
+        <div class="flip-card-back">
+          <h3>Stronger Than You Think</h3>
+          <p>
+            You’ve handled things that would break many people.<br>
+            Yet you’re still kind, still soft, still real.<br>
+            That’s strength, not weakness.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="flip-card card-pos-4" id="flipCard4" style="opacity:0; pointer-events:none;">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <img src="https://scontent.fpat2-5.fna.fbcdn.net/v/t1.15752-9/611905127_1411340457303377_3607170811748743698_n.jpg?stp=dst-jpg_s640x640_tt6&_nc_cat=104&ccb=1-7&_nc_sid=0024fc&_nc_ohc=-0IcOeDUhdYQ7kNvwENRX2x&_nc_oc=Adnv3oaQfsRNUIYAWZ43KXlWqd9Aa3Bgj9T02hnQuNhYDp7cOg-_v9rNrm9JLQKjvXAVnhf2MwLJ85VT1Gz4FOa3&_nc_ad=z-m&_nc_cid=1174&_nc_zt=23&_nc_ht=scontent.fpat2-5.fna&oh=03_Q7cD4QG1UPP6uTFe6KvBdyQRj6t6y5G09zlQF_Zq2WLHrxICIQ&oe=6996B2E7" alt="Pic 4" />
+        </div>
+        <div class="flip-card-back">
+          <h3>Pure Vibes</h3>
+          <p>
+            You don’t need filters, angles, or poses to look good.<br>
+            Your realness is your best thing.<br>
+            Stay exactly like this, it’s more than enough.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="flip-card card-pos-5" id="flipCard5" style="opacity:0; pointer-events:none;">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <img src="https://scontent.fpat2-2.fna.fbcdn.net/v/t1.15752-9/613891372_800956872558081_8782412360304689510_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=0024fc&_nc_ohc=oNhq3Ydhe2YQ7kNvwHlLvys&_nc_oc=Adm1DZX5mkZUsiKWPiaP1tc_gJxhOhsmlSd04PyncahZjr9HDum7qaNrjz77EFlEdJe9g4Bq5RYO4Tx5MfguH5wt&_nc_ad=z-m&_nc_cid=1174&_nc_zt=23&_nc_ht=scontent.fpat2-2.fna&oh=03_Q7cD4QEKQlLtUp_1Sr62uLFXJrc9YlNQTU3WI1VYMdFqE8FASg&oe=6996C59F" alt="Pic 5" />
+        </div>
+        <div class="flip-card-back">
+          <h3>Golden Heart</h3>
+          <p>
+            You joke around a lot, but beneath that you care deeply.<br>
+            People like you make friendships feel safe and honest.<br>
+            Never lose that heart.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="flip-card card-pos-6" id="flipCard6" style="opacity:0; pointer-events:none;">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <img src="https://scontent.fpat2-5.fna.fbcdn.net/v/t1.15752-9/610842388_1930636468337924_1807284498660736531_n.jpg?stp=dst-jpg_p480x480_tt6&_nc_cat=104&ccb=1-7&_nc_sid=0024fc&_nc_ohc=xJEeJ1bBywcQ7kNvwHcZayu&_nc_oc=AdmRRIACuor-N-EPyz0SyGiJiKDWRuc4vnjRSpmREZpb0P8jeKRdWSjXFeIh1loEID2TQtXWI11fihePWLVyRmLB&_nc_ad=z-m&_nc_cid=1174&_nc_zt=23&_nc_ht=scontent.fpat2-5.fna&oh=03_Q7cD4QGZ2HhAjCLlwR6bw_xtuIVwLshZbak6Z5sGLP9fm-n8Sw&oe=6996B5D0" alt="Pic 6" />
+        </div>
+        <div class="flip-card-back">
+          <h3>Still Growing</h3>
+          <p>
+            You’re not the final version of yourself yet—and that’s exciting.<br>
+            Every year you’re getting wiser, calmer, stronger.<br>
+            Can’t wait to see where you go from here.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="flip-card card-pos-7" id="flipCard7" style="opacity:0; pointer-events:none;">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <img src="https://scontent.fpat2-8.fna.fbcdn.net/v/t1.15752-9/612938959_1103376031838690_150808299763949221_n.jpg?stp=dst-jpg_s640x640_tt6&_nc_cat=100&ccb=1-7&_nc_sid=0024fc&_nc_ohc=M0CacMjcT2UQ7kNvwHvAlzQ&_nc_oc=AdmU2QdRyO6jwKpkZ889G3zQ5b5T-kFSs25GC1A1A6nwG9DZnXHCbpar0f6blCLDhLpRhlOFhoRveEeeuq5OSNZc&_nc_ad=z-m&_nc_cid=1174&_nc_zt=23&_nc_ht=scontent.fpat2-8.fna&oh=03_Q7cD4QEa8xdmSv4ncaS6FnXGZjYFOoy3jKgGDY0MolpQIfyKjQ&oe=6996D85C" alt="Pic 7" />
+        </div>
+        <div class="flip-card-back">
+          <h3>Effortless Cool</h3>
+          <p>
+            You don’t even try to impress people, and still manage to stand out.<br>
+            That natural confidence is rare.<br>
+            Own it, always.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="flip-card card-pos-8" id="flipCard8" style="opacity:0; pointer-events:none;">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <img src="https://scontent.fpat2-1.fna.fbcdn.net/v/t1.15752-9/614527683_778834147841490_6146948251034828432_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=102&ccb=1-7&_nc_sid=0024fc&_nc_ohc=n9xMfcTkCwkQ7kNvwH3RZfe&_nc_oc=AdnAb6BVmbBnEhP9FBqLuZLBiAuTVRq4OF_abh-qK4m-uEmHbfs40QuXqKkFfwackWYMUl7i5T1-UIUhWR4BFcpo&_nc_ad=z-m&_nc_cid=1174&_nc_zt=23&_nc_ht=scontent.fpat2-1.fna&oh=03_Q7cD4QFfka0WuwrWMaIkT5l8mfPLTMUKYVxwILVmcM6DSScy1Q&oe=6996E001" alt="Pic 8" />
+        </div>
+        <div class="flip-card-back">
+          <h3>Leading Energy</h3>
+          <p>
+            You have the kind of presence people naturally follow.<br>
+            Even when you don’t notice it, you influence the room.<br>
+            That’s a big responsibility, and you handle it well.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9 -->
+    <div class="flip-card card-pos-9" id="flipCard9" style="opacity:0; pointer-events:none;">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <img src="https://scontent.fpat2-5.fna.fbcdn.net/v/t1.15752-9/614520530_919709100619963_2396301925470921424_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=104&ccb=1-7&_nc_sid=0024fc&_nc_ohc=YE3q0GlzhpIQ7kNvwErdaUI&_nc_oc=AdlbEPjOUfGAYOkHXcaa6Yhww9Oa_Xj0xOD4Jujg9H_irhH_cYeV9sX-TD7CnuTaRdwwtEP9mb1aduW079SIYya1&_nc_ad=z-m&_nc_cid=1174&_nc_zt=23&_nc_ht=scontent.fpat2-5.fna&oh=03_Q7cD4QH0IMQkSL0XnMdFqTwfHzvfiGtXgAQr-7mnVW7hpLG-mg&oe=6996D6D8" alt="Pic 9" />
+        </div>
+        <div class="flip-card-back">
+          <h3>Hard Work Shows</h3>
+          <p>
+            You may not brag about it, but the effort you put into life is visible.<br>
+            You deserve every good thing that’s coming your way.<br>
+            Don’t forget that.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="flip-card card-pos-10" id="flipCard10" style="opacity:0; pointer-events:none;">
+      <div class="flip-card-inner">
+        <div class="flip-card-front">
+          <img src="https://scontent.fpat2-7.fna.fbcdn.net/v/t1.15752-9/614851477_1962865087663038_6898240133737881446_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=101&ccb=1-7&_nc_sid=0024fc&_nc_ohc=A_3wQsGErZ4Q7kNvwG8qDhB&_nc_oc=AdmOtpSvTgyC25KWN5YoYbJwP8U07SjxUfqOUZ_kiPzpDG4Fh7d5AHfzrF3uXeoVNC2vlqhxU_UZKHLdmViyZBkT&_nc_ad=z-m&_nc_cid=1174&_nc_zt=23&_nc_ht=scontent.fpat2-7.fna&oh=03_Q7cD4QGwWrKRWWw7BErKuV_I4MzLheUib6-pi5saD3bKhoUgvg&oe=6996CD63" alt="Pic 10" />
+        </div>
+        <div class="flip-card-back">
+          <h3>Rare Soul</h3>
+          <p>
+            Looks fade, trends change, people move on.<br>
+            But your loyalty, your nature, the way you love—that’s what makes you unforgettable.<br>
+            Don’t ever doubt your worth.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ending overlay -->
+  <div class="ending-overlay" id="endingOverlay">
+    <div class="ending-text" id="endingText1">
+      Kabhi kabhi lagta hai ki life thodi difficult ho gayi hai,<br>
+      phir yaad aata hai – tu hai na. Thank you for being my constant, Harsh. 💛
+    </div>
+    <div class="ending-text ending-text-2" id="endingText2" style="display:none;">
+      Kaisa laga?? 😏😂<br>
+      Thoda filmy ho gaya na, par tu isse zyada deserve karta hai.
+    </div>
+    <!-- First panda for THANK-YOU screen -->
+    <img
+      id="pandaGif1"
+      class="panda-gif"
+      src="https://media.tenor.com/5dv2ZA1_uVQAAAAm/tkthao219-bubududu.webp"
+      alt="Thank you panda"
+      style="display:none;"
+    />
+    <!-- Second panda for KAISA LAGA screen -->
+    <img
+      id="pandaGif2"
+      class="panda-gif"
+      src="https://media.tenor.com/xsTmm-84W8MAAAAm/tkthao219-bubududu.webp"
+      alt="Funny panda GIF"
+      style="display:none;"
+    />
+    <a
+      class="insta-link"
+      href="https://www.instagram.com/_i.msaurav_?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      @_i.msaurav_
+    </a>
+  </div>
+
+  <!-- YouTube IFrame API: 3 songs -->
+  <script>
+    const videoIds = ['6Vbgeiu9AIU','C1DucVoyfwY','ZEkW7pd5vo0'];
+    let currentIndex = 0;
+    let player;
+
+    const cardIds = [
+      'flipCard1','flipCard2','flipCard3','flipCard4','flipCard5',
+      'flipCard6','flipCard7','flipCard8','flipCard9','flipCard10'
+    ];
+
+    (function () {
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    })();
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        videoId: videoIds[0],
+        playerVars: { rel:0, modestbranding:1, controls:1, autoplay:0, loop:0 },
+        events: { 'onStateChange': onPlayerStateChange }
+      });
+    }
+
+    function onPlayerStateChange(event) {
+      const videoStage  = document.getElementById('video-stage');
+      const spaceStage  = document.getElementById('space-stage');
+      const cakeWrapper = document.getElementById('cakeWrapper');
+      const bg          = document.getElementById('bg');
+      const cardArea    = document.getElementById('cardArea');
+
+      if (event.data === YT.PlayerState.PLAYING && !spaceStage.dataset.started) {
+        spaceStage.dataset.started = 'true';
+
+        videoStage.style.opacity = '0';
+        videoStage.style.visibility = 'hidden';
+
+        bg.classList.remove('bg-slow');
+        bg.classList.add('bg-medium');
+
+        spaceStage.style.visibility = 'visible';
+        spaceStage.style.opacity = '1';
+        cakeWrapper.classList.add('visible');
+
+        setTimeout(() => {
+          cakeWrapper.classList.add('disappear');
+
+          bg.classList.remove('bg-medium');
+          bg.classList.add('bg-fast');
+
+          setTimeout(() => {
+            bg.classList.remove('bg-fast');
+            bg.classList.add('bg-slow');
+
+            // show card area
+            cardArea.style.display = 'flex';
+            requestAnimationFrame(() => {
+              cardArea.classList.add('visible');
+
+              const flipCard1 = document.getElementById('flipCard1');
+              setTimeout(() => {
+                flipCard1.classList.add('flipped');
+                setTimeout(() => {
+                  flipCard1.classList.remove('flipped');
+                }, 2300);
+              }, 800);
+
+              // sequentially show other cards every 15 seconds
+              const laterCards = cardIds.slice(1);
+              laterCards.forEach((id, index) => {
+                setTimeout(() => {
+                  const el = document.getElementById(id);
+                  if (!el) return;
+                  el.style.transition = 'opacity 0.7s ease';
+                  el.style.opacity = '1';
+                  el.style.pointerEvents = 'auto';
+                }, (index + 1) * 15000);
+              });
+
+              // after last card visible + 15s: start ending sequence
+              const totalCards = laterCards.length;
+              const lastCardTime = (totalCards) * 15000;
+              setTimeout(startEndingSequence, lastCardTime + 15000);
+            });
+          }, 1200);
+        }, 20000);
+      }
+
+      if (event.data === YT.PlayerState.ENDED) {
+        currentIndex++;
+        if (currentIndex < videoIds.length) {
+          player.loadVideoById(videoIds[currentIndex]);
+          videoStage.style.opacity = '0';
+          videoStage.style.visibility = 'hidden';
+        }
+      }
+    }
+
+    // Ending sequence: flip all, queue, fly away, then texts + pandas
+    function startEndingSequence() {
+      const cardArea = document.getElementById('cardArea');
+      const cards = cardIds.map(id => document.getElementById(id)).filter(Boolean);
+      if (!cards.length) return;
+
+      // 1) Flip all cards to show messages
+      cards.forEach(c => c.classList.add('flipped'));
+
+      // 2) After 2s, move into vertical queue
+      setTimeout(() => {
+        cardArea.classList.add('queue-mode');
+        const centerX = window.innerWidth / 2;
+        const startY = window.innerHeight * 0.15;
+        const gap = 40;
+
+        cards.forEach((card, index) => {
+          card.style.left = centerX + 'px';
+          card.style.top = (startY + index * gap) + 'px';
+          card.style.transform = 'translate(-50%, -50%)';
+        });
+
+        // 3) After 2s queued, fly all around and fade
+        setTimeout(() => {
+          cards.forEach(card => {
+            card.classList.add('fly-away');
+          });
+
+          // 4) After 2s of fly animation, hide cards + show ending text
+          setTimeout(() => {
+            cardArea.style.display = 'none';
+
+            const endingOverlay = document.getElementById('endingOverlay');
+            const endingText1 = document.getElementById('endingText1');
+            const endingText2 = document.getElementById('endingText2');
+            const pandaGif1 = document.getElementById('pandaGif1');
+            const pandaGif2 = document.getElementById('pandaGif2');
+
+            endingOverlay.classList.add('visible');
+            endingText1.style.display = 'block';
+            pandaGif1.style.display = 'block';
+
+            // After 10s, switch to "Kaisa laga??" + second panda
+            setTimeout(() => {
+              endingText1.style.display = 'none';
+              pandaGif1.style.display = 'none';
+
+              endingText2.style.display = 'block';
+              pandaGif2.style.display = 'block';
+            }, 10000);
+          }, 2000);
+        }, 2000);
+      }, 2000);
+    }
+
+    // Tap / click: flip each card independently (during main viewing)
+    document.addEventListener('DOMContentLoaded', () => {
+      cardIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('click', () => {
+          el.classList.toggle('flipped');
+        });
+      });
+    });
+  </script>
+</body>
+</html>
